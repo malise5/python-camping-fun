@@ -25,8 +25,9 @@ class Activity(db.Model, SerializerMixin):
     difficulty = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+
     signups = db.relationship("Signup", backref="activity")
-    campers = db.relationship("Camper", backref="activity")
+    campers = association_proxy("signups", "camper")
 
     serialize_rules = ("-created_at", "-updated_at", "-signups", "-campers")
 
@@ -43,6 +44,12 @@ class Signup(db.Model, SerializerMixin):
 
     serialize_rules = ("-created_at", "-updated_at")
 
+    @validates("time")
+    def validates_time(self, key, time):
+        if 0 <= time <= 23:
+            return time
+        raise ValueError("The time must be between 0 to 23 hrs")
+
 
 class Camper(db.Model, SerializerMixin):
     __tablename__ = 'campers'
@@ -55,7 +62,7 @@ class Camper(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
     signups = db.relationship("Signup", backref="camper")
-    acitivities = db.relationship("Activity", backref="camper")
+    activities = association_proxy("signups", "activity")
 
     serialize_rules = ("-created_at", "-updated_at",
                        "-signups", "-acitivities")
