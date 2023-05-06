@@ -26,7 +26,8 @@ class Activity(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    signups = db.relationship("Signup", backref="activity")
+    signups = db.relationship(
+        "Signup", backref="activity", cascade="all, delete-orphan")
     campers = association_proxy("signups", "camper")
 
     serialize_rules = ("-created_at", "-updated_at", "-signups", "-campers")
@@ -39,6 +40,10 @@ class Signup(db.Model, SerializerMixin):
     camper_id = db.Column(db.Integer, db.ForeignKey("campers.id"))
     activity_id = db.Column(db.Integer, db.ForeignKey("activities.id"))
     time = db.Column(db.Integer)
+
+    camper = db.relationship("Camper", back_populates="signups")
+    activity = db.relationship("Activity", back_populates="signups")
+
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
