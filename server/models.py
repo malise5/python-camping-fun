@@ -44,8 +44,13 @@ class Signup(db.Model, SerializerMixin):
     camper = db.relationship("Camper", back_populates="signups")
     activity = db.relationship("Activity", back_populates="signups")
 
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
-    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+    # created_at = db.Column(db.DateTime, server_default=db.func.now())
+    # updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow, onupdate=datetime.utcnow)
 
     serialize_rules = ("-created_at", "-updated_at")
 
